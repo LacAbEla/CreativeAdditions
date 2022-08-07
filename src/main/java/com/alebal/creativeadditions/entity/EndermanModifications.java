@@ -53,13 +53,18 @@ public final class EndermanModifications {
 
     @SubscribeEvent
     public static void entityJoinEvent(EntityJoinWorldEvent event){
-        if(event.getEntity() instanceof EnderMan enderman) {
-            // Replace enderman's EndermanTakeBlockGoal with EndermanBurnOnTakeBlockGoal.
+        if(!event.getWorld().isClientSide() && event.getEntity() instanceof EnderMan enderman) {
+            // Replace enderman's EndermanTakeBlockGoal with EndermanBurnInsteadOfTakeBlockGoal.
+            Integer blockGoalPriority = null;
             for(var wrappedGoal : enderman.goalSelector.getAvailableGoals()){
-                if(wrappedGoal.getGoal().toString().equals("EndermanTakeBlockGoal"))
+                if(wrappedGoal.getGoal().toString().equals("EndermanTakeBlockGoal")) {
+                    blockGoalPriority = wrappedGoal.getPriority();
                     enderman.goalSelector.removeGoal(wrappedGoal.getGoal());
+                    break; // There should be no more than one goal of each type.
+                }
             }
-            enderman.goalSelector.addGoal(11, new EndermanBurnInsteadOfTakeBlockGoal(enderman));
+            if(blockGoalPriority != null)
+                enderman.goalSelector.addGoal(blockGoalPriority, new EndermanBurnInsteadOfTakeBlockGoal(enderman));
         }
     }
 }
