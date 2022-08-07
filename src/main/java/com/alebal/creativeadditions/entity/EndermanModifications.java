@@ -1,5 +1,6 @@
 package com.alebal.creativeadditions.entity;
 
+import com.mojang.logging.LogUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.util.Mth;
@@ -13,6 +14,7 @@ import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
+import org.slf4j.Logger;
 
 import java.util.Random;
 
@@ -20,6 +22,8 @@ import java.util.Random;
  * Modifications to the vanilla EnderMan.
  */
 public final class EndermanModifications {
+    private static final Logger LOGGER = LogUtils.getLogger();
+
     public static class EndermanBurnInsteadOfTakeBlockGoal extends EnderMan.EndermanTakeBlockGoal {
         public EndermanBurnInsteadOfTakeBlockGoal(EnderMan pEnderman) {
             super(pEnderman);
@@ -51,20 +55,24 @@ public final class EndermanModifications {
         MinecraftForge.EVENT_BUS.register(EndermanModifications.class);
     }
 
+    /**
+     * Replaces every enderman's EndermanTakeBlockGoal with EndermanBurnInsteadOfTakeBlockGoal.
+     */
     @SubscribeEvent
     public static void entityJoinEvent(EntityJoinWorldEvent event){
         if(!event.getWorld().isClientSide() && event.getEntity() instanceof EnderMan enderman) {
-            // Replace enderman's EndermanTakeBlockGoal with EndermanBurnInsteadOfTakeBlockGoal.
-            Integer blockGoalPriority = null;
-            for(var wrappedGoal : enderman.goalSelector.getAvailableGoals()){
+            Integer takeBlockGoalPriority = null;
+            for(var wrappedGoal : enderman.goalSelector.getAvailableGoals()) {
                 if(wrappedGoal.getGoal().toString().equals("EndermanTakeBlockGoal")) {
-                    blockGoalPriority = wrappedGoal.getPriority();
+                    takeBlockGoalPriority = wrappedGoal.getPriority();
                     enderman.goalSelector.removeGoal(wrappedGoal.getGoal());
                     break; // There should be no more than one goal of each type.
                 }
             }
-            if(blockGoalPriority != null)
-                enderman.goalSelector.addGoal(blockGoalPriority, new EndermanBurnInsteadOfTakeBlockGoal(enderman));
+            if(takeBlockGoalPriority != null)
+                enderman.goalSelector.addGoal(takeBlockGoalPriority, new EndermanBurnInsteadOfTakeBlockGoal(enderman));
+            else
+                LOGGER.error("Could not find EndermanTakeBlockGoal! Enderman not modified.");
         }
     }
 }
