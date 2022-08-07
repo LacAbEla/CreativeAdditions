@@ -1,6 +1,7 @@
 package com.alebal.creativeadditions;
 
 import com.alebal.creativeadditions.entity.EndermanModifications;
+import com.alebal.creativeadditions.item.ModItems;
 import com.mojang.logging.LogUtils;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.IEventBus;
@@ -24,6 +25,7 @@ public class CreativeAdditions
         modEventBus.addListener(this::setup);
 
         EndermanModifications.register();
+        ModItems.register(modEventBus);
 
         // Register ourselves for server and other game events we are interested in
         MinecraftForge.EVENT_BUS.register(this);
