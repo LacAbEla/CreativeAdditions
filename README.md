@@ -7,7 +7,7 @@ LacAbEla's useful and weird additions to spice up your (my) creative worlds/serv
   They will also briefly catch fire as a punishment for their actions.
 
 ## TODO:
-* ### Cuffs for villagers
+* ### Handcuffs for villagers
   Prevent those pesky villagers from getting away when they do something bad!<br>
   These will prevent the villager from moving.
 
