@@ -20,6 +20,7 @@ public class HandcuffsItem extends Item {
 
     // None of these work on villagers and it appears there are no more interaction methods
     // TODO Some interacteable entities like villagers (but not horses) appear to prevent this from executing. Is there a way to prevent that without events?
+        // sneaking works, but I would prefer it to have priority over trading
         // if using events I could either make everything happen on an event like I was doing before
         // or try to use the event to cancel further events if the item is being held
     @Override

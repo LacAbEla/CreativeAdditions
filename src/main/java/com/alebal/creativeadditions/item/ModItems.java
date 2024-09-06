@@ -16,6 +16,7 @@ public class ModItems {
     //        () -> new Item(new Item.Properties().tab(CreativeModeTab.TAB_MISC)));
 
     public static final RegistryObject<Item> HANDCUFFS = ITEMS.register("handcuffs", HandcuffsItem::new);
+    public static final RegistryObject<Item> FIREBALL_LAUNCHER = ITEMS.register("fireball_launcher", FireballLauncherItem::new);
 
     public static void register(IEventBus eventBus) {
         ITEMS.register(eventBus);
