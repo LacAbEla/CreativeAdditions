@@ -1,5 +1,6 @@
 package com.alebal.creativeadditions.item;
-import com.alebal.creativeadditions.CreativeAdditions;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.player.Player;
@@ -8,28 +9,41 @@ import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
+import java.util.Random;
 
 public class FireballLauncherItem extends Item {
+    private int explosionPower = 1;
+
 
     public FireballLauncherItem() {
         super(new Properties().tab(CreativeModeTab.TAB_COMBAT));
     }
     // TODO replace fireball_launcher's texture with a 3D model
+    // TODO Add variations or configuration options for more speed or power
+
 
     @Override
     public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand usedHand) {
-        CreativeAdditions.LOGGER.debug("FOOSH. Hand: " + usedHand + ". Looking: " + player.getLookAngle() + " - client?:" + level.isClientSide());
+        // Play sound(s)
+        Random random = level.random;
+        level.playSound(player, player.getX(), player.getY(), player.getZ(), SoundEvents.GHAST_SHOOT, SoundSource.PLAYERS, 1, (random.nextFloat() - random.nextFloat()) * 0.2F + 1.0F);
+        if (random.nextFloat() >= 0.96F) {
+            if (random.nextFloat() >= 0.4F)
+                level.playSound(player, player.getX(), player.getY(), player.getZ(), SoundEvents.GHAST_SCREAM, SoundSource.PLAYERS, 0.75F, (random.nextFloat() - random.nextFloat()) * 0.1F + 1.0F);
+            else
+                level.playSound(player, player.getX(), player.getY(), player.getZ(), SoundEvents.GHAST_HURT, SoundSource.PLAYERS, 0.75F, (random.nextFloat() - random.nextFloat()) * 0.2F + 1.0F);
+        }
 
-        // TODO play a sound when firing
+        // Launch fireball
         if(!level.isClientSide()) {
             var lookAngle = player.getLookAngle();
-            var fireball = new LargeFireball(level, player, lookAngle.x, lookAngle.y, lookAngle.z, 1);
-            fireball.setPosRaw(fireball.getX(), fireball.getY() + player.getEyeHeight() * 0.75, fireball.getZ());
-            fireball.setDeltaMovement(player.getDeltaMovement()); // TODO this should copy the player's momentum
-            // TODO add offset? Launching fireballs repeatedly while still is visually unpleasant
+            var fireball = new LargeFireball(level, player, lookAngle.x, lookAngle.y, lookAngle.z, explosionPower); // The "offset" parameters are used to calculate the fireball's direction
+            fireball.setPosRaw(fireball.getX() + lookAngle.x, fireball.getY() + player.getEyeHeight() + lookAngle.y, fireball.getZ() + lookAngle.z);
+            //fireball.setDeltaMovement(player.getDeltaMovement()); // TODO this should copy the player's momentum
+            // TODO check if there is a block ahead. The shooting offset allows to shoot through blocks that are less than 1m wide
             level.addFreshEntity(fireball);
-
         }
+
         return InteractionResultHolder.success(player.getItemInHand(usedHand));
     }
 }
